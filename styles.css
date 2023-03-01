@@ -1,0 +1,120 @@
+:root {
+    --main: white;
+    --main-dark: #f2e2d2;
+    --second: #235789;
+    --third: #48BEFF;
+    --fourth: #73D2DE;
+}
+
+body {
+    background-color: var(--second);
+    color: black;
+}
+
+.navbar {
+    background-color: var(--third);
+    border: 1px solid grey;    
+}
+
+.navbar-brand {
+    color: black !important;
+}
+
+.container {
+    background-color: var(--main);
+    border-left: solid 1px grey;
+    border-right: solid 1px grey;
+    border-radius: 5px;
+}
+
+.profile {
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.img {
+    border-radius: 15px;
+    border: solid 2px black;
+}
+
+.icon {
+    height: 25px;
+}
+
+.nav-link {
+    background-color: var(--main-dark) !important;
+    color: black;
+    border: 1px solid !important;
+    width: 100%;
+}
+
+.nav-link.active {
+    background-color: var(--third) !important;
+    color: black !important;
+}
+
+.text-center {
+    margin: auto;
+}
+
+.tab-pane {
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.info {
+    width: 50%;
+    margin: 10px auto;
+
+}
+
+.list-item {
+    padding: 5px;
+    border-bottom: solid 1px grey
+}
+
+.dropdown-menu {
+    min-width: 3rem;
+}
+
+.color-item {
+    text-align: center
+}
+
+.bubble {
+    border-radius: 100%;
+    border: 1px solid grey;
+    width: 15px;
+    height: 15px;
+    padding: 0;
+    margin: 5px 15px;
+}
+
+    .bubble.red {
+        background-color: red;
+    }
+
+    .bubble.green {
+        background-color: green;
+    }
+
+    .bubble.yellow {
+        background-color: yellow;
+    }
+
+    .bubble.blueviolet {
+        background-color: blueviolet;
+    }
+
+    .bubble.grey {
+        background-color: grey;
+    }
+
+    .bubble.lightblue {
+        background-color: #48BEFF;
+    }
+
+    .bubble.white {
+        background-color: white;
+    }
