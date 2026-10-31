@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluación de Brillo y Rugosidad</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #e2e8f0;
+      color: #1e293b;
+    }
+    .panel-surface {
+      background-color: #f1f5f9;
+    }
+    .card-surface {
+      background-color: #f8fafc;
+    }
+    input[type="range"].mushra-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      outline: none;
+    }
+    input[type="range"].mushra-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0284c7;
+      cursor: pointer;
+      border: 2px solid #f8fafc;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+    }
+    input[type="range"].mushra-slider.roughness-slider::-webkit-slider-thumb {
+      background: #d97706;
+    }
+    input[type="range"].mushra-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0284c7;
+      cursor: pointer;
+      border: 2px solid #f8fafc;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.25);
+    }
+    input[type="range"].mushra-slider.roughness-slider::-moz-range-thumb {
+      background: #d97706;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="panel-surface border-b border-slate-300 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-semibold text-slate-800">Evaluación de Brillo y Rugosidad</span>
+      </div>
+      <span id="stepHeaderCounter" class="text-xs font-medium text-slate-600">Paso 1 de 4</span>
+    </div>
+    <div class="w-full bg-slate-300 h-1">
+      <div id="progressBar" class="bg-sky-600 h-1 transition-all duration-300" style="width: 25%"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- STEP 1: CONDICIONES Y DATOS DEL PARTICIPANTE -->
+    <section id="step1Section" class="panel-surface rounded-xl border border-slate-300 p-6 sm:p-8 space-y-6">
+      <div class="space-y-2 border-b border-slate-300/80 pb-4">
+        <h2 class="text-lg sm:text-xl font-bold text-slate-900">Cuestionario inicial</h2>
+        <p class="text-sm text-slate-700 leading-relaxed">
+          Esta prueba evalúa la percepción de distintas características del sonido y tiene una duración de <strong>3 a 5 minutos</strong>. Es importante que la realices con <strong>auriculares</strong> y en un <strong>ambiente silencioso</strong>, libre de ruidos de fondo o interrupciones.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="inputAlias" class="block text-xs font-semibold text-slate-700 mb-1">
+            Nombre (opcional)
+          </label>
+          <input id="inputAlias" type="text" placeholder="" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none" />
+        </div>
+
+        <div>
+          <label for="inputAge" class="block text-xs font-semibold text-slate-700 mb-1">
+            Edad <span class="text-rose-600">*</span>
+          </label>
+          <input id="inputAge" type="number" min="15" max="60" placeholder="" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none" />
+        </div>
+
+        <div>
+          <label for="selectHearing" class="block text-xs font-semibold text-slate-700 mb-1">
+            ¿Presentás alguna disminución auditiva o tinnitus? <span class="text-rose-600">*</span>
+          </label>
+          <select id="selectHearing" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
+            <option value="normal">No, tengo audición normal</option>
+            <option value="leve">Sí, tengo disminución auditiva o tinnitus</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="selectHeadphones" class="block text-xs font-semibold text-slate-700 mb-1">
+            Tipo de auriculares que estás usando <span class="text-rose-600">*</span>
+          </label>
+          <select id="selectHeadphones" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
+            <option value="">Seleccioná una opción...</option>
+            <option value="over-ear">De vincha (sobre la oreja)</option>
+            <option value="earbuds">Earbuds clásicos (sobre el oído)</option>
+            <option value="in-ear">In-ear (dentro del oído)</option>
+          </select>
+        </div>        
+
+        <div>
+          <label for="selectExposure" class="block text-xs font-semibold text-slate-700 mb-1">
+            ¿Estuviste expuesto/a a ruidos fuertes o música a volumen alto en las últimas 12 horas?
+          </label>
+          <select id="selectExposure" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+          </select>
+        </div>       
+
+        <div>
+          <label for="selectSensibility" class="block text-xs font-semibold text-slate-700 mb-1">
+            ¿Qué tan sensible te considerás frente a ruidos cotidianos (motores, electrodomésticos, ventiladores)?
+          </label>
+          <select id="selectSensibility" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
+            <option value="baja">Casi no me molestan (los ignoro fácilmente)</option>
+            <option value="normal" selected>Normal (solo me molestan si son muy fuertes)</option>
+            <option value="alta">Me molestan mucho (me distraen/irritan fácil)</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="selectExperience" class="block text-xs font-semibold text-slate-700 mb-1">
+            Experiencia previa en música o audio
+          </label>
+          <select id="selectExperience" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
+            <option value="no-experto">Oyente general (sin formación en sonido)</option>
+            <option value="musico-aficionado">Músico o aficionado</option>
+            <option value="estudiante-profesional">Estudiante o profesional de sonido / acústica</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="step1Error" class="hidden text-xs font-medium text-rose-700 bg-rose-100/80 border border-rose-300 rounded-lg px-3.5 py-2">
+        Completá tu edad y el tipo de auriculares para continuar.
+      </div>
+
+      <div id="step1Error" class="hidden text-xs font-medium text-rose-700 bg-rose-100/80 border border-rose-300 rounded-lg px-3.5 py-2">
+        Completá tu edad y el tipo de auriculares para continuar.
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button id="btnStep1Next" type="button" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm transition">
+          Continuar →
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 2: CALIBRACIÓN Y DEFINICIONES -->
+    <section id="step2Section" class="hidden panel-surface rounded-xl border border-slate-300 p-6 sm:p-8 space-y-6">
+      <div class="space-y-1.5 border-b border-slate-300/80 pb-4">
+        <h2 class="text-lg sm:text-xl font-bold text-slate-900">Ajuste de volumen y guía rápida</h2>
+        <p class="text-sm text-slate-700">
+          Asegurate de estar en un lugar silencioso antes de calibrar el nivel de tus auriculares.
+        </p>
+      </div>
+
+      <!-- Volume Calibration -->
+      <div class="card-surface border border-slate-300 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <h3 class="text-sm font-bold text-slate-900">1. Ajuste de volumen</h3>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Reproducí el audio de prueba y ajustá el volumen de tu dispositivo a un <strong>nivel cómodo y claro</strong>. Luego no lo modifiques durante la prueba.
+          </p>
+        </div>
+        <button id="btnPlayCalibration" type="button" class="shrink-0 px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs sm:text-sm transition">
+          ▶ Audio de prueba
+        </button>
+      </div>
+
+      <!-- Definitions -->
+      <div class="space-y-3">
+        <h3 class="text-sm font-bold text-slate-900">2. Definición de las características a evaluar</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="card-surface rounded-xl border border-slate-300 p-4 space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+              <span class="text-sm font-bold text-sky-800">Etapa 1: Brillo</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Qué tan <strong>agudo, metálico o "chillón"</strong> suena el audio, frente a un sonido más <strong>opaco o grave</strong> (0 = muy opaco, 100 = muy brillante).
+            </p>
+          </div>
+
+          <div class="card-surface rounded-xl border border-slate-300 p-4 space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+              <span class="text-sm font-bold text-amber-800">Etapa 2: Rugosidad</span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Qué tan <strong>áspero, rasposo o vibrante</strong> se siente el sonido, frente a un sonido <strong>liso o parejo</strong> (0 = muy liso, 100 = muy áspero).
+              
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button id="btnStep2Back" type="button" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-200/60 font-medium text-sm transition">
+          ← Volver
+        </button>
+        <button id="btnStep2Next" type="button" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm transition">
+          Iniciar Etapa 1 →
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3: ETAPA 1 - BRILLO -->
+    <section id="step3Section" class="hidden panel-surface rounded-xl border border-slate-300 p-6 sm:p-8 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-300/80 pb-3">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-sky-800">Etapa 1: Evaluación de Brillo</h2>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Escuchá y compará los 6 sonidos. Calificá qué tan <strong>brillante o agudo</strong> suena cada uno del 0 al 100.
+            Se sugiere escuchar primero los 6 sonidos para identificar los extremos antes de fijar tus puntajes.
+          </p>
+        </div>        
+      </div>
+
+      <div id="stimuliGridA" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button id="btnStep3Back" type="button" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-200/60 font-medium text-sm transition">
+          ← Volver
+        </button>
+        <button id="btnStep3Next" type="button" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm transition">
+          Pasar a Etapa 2 →
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 4: ETAPA 2 - RUGOSIDAD -->
+    <section id="step4Section" class="hidden panel-surface rounded-xl border border-slate-300 p-6 sm:p-8 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-300/80 pb-3">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-amber-800">Etapa 2: Evaluación de Rugosidad</h2>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Escuchá y compará los 6 sonidos. Calificá qué tan <strong>áspero o rasposo</strong> se siente cada uno del 0 al 100.
+            Se sugiere escuchar primero los 6 sonidos para identificar los extremos antes de fijar tus puntajes.
+          </p>
+        </div>
+      </div>
+
+      <div id="stimuliGridB" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <!-- Populated by JS -->
+      </div>
+
+      <div class="pt-1">
+        <label for="inputComments" class="block text-xs font-semibold text-slate-700 mb-1">
+          Comentarios opcionales (por ejemplo, si te costó poner los puntajes, si tuviste algún inconveniente técnico, ruido externo, etc.)
+        </label>
+        <input id="inputComments" type="text" placeholder="Opcional..." class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none" />
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button id="btnStep4Back" type="button" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-200/60 font-medium text-sm transition">
+          ← Volver a Etapa 1
+        </button>
+        <button id="btnSubmitFinal" type="button" class="px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm transition">
+          <span id="btnSubmitFinalText">Enviar respuestas ✓</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 5: PANTALLA FINAL -->
+    <section id="step5Section" class="hidden panel-surface rounded-xl border border-slate-300 p-8 sm:p-10 text-center space-y-3">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xl flex items-center justify-center mx-auto border border-emerald-300">
+        ✓
+      </div>
+      <h2 class="text-xl font-bold text-slate-900">¡Muchas gracias por participar!</h2>
+      <p id="submissionStatusText" class="text-sm text-slate-600 max-w-md mx-auto">
+        Tus respuestas fueron registradas correctamente. Ya podés cerrar esta pestaña.
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // CONFIGURACIÓN (Rellenar las URLs antes de subir a GitHub Pages)
+    // =========================================================================
+
+    // 1. URL de tu Google Apps Script ("https://script.google.com/macros/s/.../exec")
+    const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzPe-FhNH_VBXHT2bUP_1B-8TsgYI_Awu9GKIr01GE4oAaVHcZPxG_gH1hGZWAFfC2S/exec";
+
+    // 2. URL o ruta relativa del audio de calibración (Paso 2)
+    const CALIBRATION_AUDIO_URL = "audios/AM_00.wav";
+
+    // 3. URLs o rutas relativas de los 6 estímulos
+    const STIMULI_LIST = [
+      { id: "00_AM",   url: "audios/AM_00.wav" },
+      { id: "20_AM",   url: "audios/AM_20.wav" },
+      { id: "40_AM",   url: "audios/AM_40.wav" },
+      { id: "60_AM",   url: "audios/AM_60.wav" },
+      { id: "EV_AVAS", url: "audios/EV_AVAS.wav" },
+      { id: "HVAC",    url: "audios/HVAC.wav" }
+    ];
+
+    // =========================================================================
+    // ESTADO E IDENTIFICADOR ÚNICO DE DISPOSITIVO
+    // =========================================================================
+    function getOrCreateDeviceId() {
+      const key = "mushra_untref_device_id";
+      try {
+        let id = localStorage.getItem(key);
+        if (!id) {
+          id = "DEV-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
+          localStorage.setItem(key, id);
+        }
+        return id;
+      } catch (e) {
+        return "DEV-ANON-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      }
+    }
+
+    function hasAlreadySubmitted() {
+      try {
+        return localStorage.getItem("mushra_untref_completed") === "true";
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function markAsSubmitted() {
+      try {
+        localStorage.setItem("mushra_untref_completed", "true");
+      } catch (e) {}
+    }
+
+    const state = {
+      currentStep: 1,
+      deviceId: getOrCreateDeviceId(),
+      participant: {
+        alias: "",
+        age: "",
+        hearing: "normal",
+        headphones: "",
+        exposure: "no",
+        sensibility: "normal",
+        experience: "no-experto"
+      },
+      orderStageA: [],
+      orderStageB: [],
+      ratingsBrightness: {
+        "00_AM": 0, "20_AM": 0, "40_AM": 0, "60_AM": 0, "EV_AVAS": 0, "HVAC": 0
+      },
+      ratingsRoughness: {
+        "00_AM": 0, "20_AM": 0, "40_AM": 0, "60_AM": 0, "EV_AVAS": 0, "HVAC": 0
+      },
+      activePlayKey: null
+    };
+
+    // =========================================================================
+    // REPRODUCTOR DE AUDIO HTML5
+    // =========================================================================
+    const audioPlayer = new Audio();
+    audioPlayer.preload = "auto";
+
+    audioPlayer.addEventListener("ended", () => {
+      state.activePlayKey = null;
+      updateAudioButtonsUI();
+    });
+
+    function stopCurrentAudio() {
+      audioPlayer.pause();
+      audioPlayer.currentTime = 0;
+      state.activePlayKey = null;
+      updateAudioButtonsUI();
+    }
+
+    function togglePlayUrl(url, playKey) {
+      if (state.activePlayKey === playKey) {
+        stopCurrentAudio();
+        return;
+      }
+      stopCurrentAudio();
+      audioPlayer.src = url;
+      state.activePlayKey = playKey;
+      updateAudioButtonsUI();
+      audioPlayer.play().catch(() => {
+        state.activePlayKey = null;
+        updateAudioButtonsUI();
+      });
+    }
+
+    function updateAudioButtonsUI() {
+      const btnCal = document.getElementById("btnPlayCalibration");
+      if (state.activePlayKey === "CAL") {
+        btnCal.textContent = "⏹ Detener";
+        btnCal.className = "shrink-0 px-4 py-2.5 rounded-lg bg-sky-700 text-white font-medium text-xs sm:text-sm transition";
+      } else {
+        btnCal.textContent = "▶ Audio de prueba";
+        btnCal.className = "shrink-0 px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs sm:text-sm transition";
+      }
+
+      document.querySelectorAll("[data-play-stim]").forEach(btn => {
+        const stimId = btn.getAttribute("data-play-stim");
+        const stageKey = btn.getAttribute("data-stage");
+        const playKey = stageKey + "_" + stimId;
+        const isPlaying = state.activePlayKey === playKey;
+
+        if (isPlaying) {
+          btn.textContent = "⏹ Detener";
+          btn.className = "px-3 py-1.5 rounded-lg bg-sky-700 text-white font-medium text-xs transition";
+        } else {
+          btn.textContent = "▶ Escuchar";
+          btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition";
+        }
+      });
+    }
+
+    // =========================================================================
+    // RENDERIZADO DE TARJETAS
+    // =========================================================================
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function renderStimuliGrids() {
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const gridA = document.getElementById("stimuliGridA");
+      const gridB = document.getElementById("stimuliGridB");
+      gridA.innerHTML = "";
+      gridB.innerHTML = "";
+
+      // Etapa 1: Brillo
+      state.orderStageA.forEach((stim, idx) => {
+        const letter = letters[idx];
+        const bVal = state.ratingsBrightness[stim.id];
+
+        const card = document.createElement("div");
+        card.className = "card-surface rounded-xl border border-slate-300 p-4 space-y-3";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-800">Sonido ${letter}</span>
+            <button type="button" data-play-stim="${stim.id}" data-url="${stim.url}" data-stage="A" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition">
+              ▶ Escuchar
+            </button>
+          </div>
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-sky-800">Brillo</span>
+              <span id="val_b_${stim.id}" class="text-xs font-bold text-sky-800">${bVal}</span>
+            </div>
+            <input type="range" min="0" max="100" step="1" value="${bVal}" data-slider-type="brightness" data-stim="${stim.id}" class="mushra-slider" />
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>0 (Opaco)</span>
+              <span>100 (Brillante)</span>
+            </div>
+          </div>
+        `;
+        gridA.appendChild(card);
+      });
+
+      // Etapa 2: Rugosidad
+      state.orderStageB.forEach((stim, idx) => {
+        const letter = letters[idx];
+        const rVal = state.ratingsRoughness[stim.id];
+
+        const card = document.createElement("div");
+        card.className = "card-surface rounded-xl border border-slate-300 p-4 space-y-3";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-800">Sonido ${letter}</span>
+            <button type="button" data-play-stim="${stim.id}" data-url="${stim.url}" data-stage="B" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs transition">
+              ▶ Escuchar
+            </button>
+          </div>
+          <div class="space-y-1.5 pt-1">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-amber-800">Rugosidad</span>
+              <span id="val_r_${stim.id}" class="text-xs font-bold text-amber-800">${rVal}</span>
+            </div>
+            <input type="range" min="0" max="100" step="1" value="${rVal}" data-slider-type="roughness" data-stim="${stim.id}" class="mushra-slider roughness-slider" />
+            <div class="flex justify-between text-[10px] text-slate-500">
+              <span>0 (Liso)</span>
+              <span>100 (Áspero)</span>
+            </div>
+          </div>
+        `;
+        gridB.appendChild(card);
+      });
+
+      document.querySelectorAll("[data-play-stim]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const stimId = btn.getAttribute("data-play-stim");
+          const url = btn.getAttribute("data-url");
+          const stageKey = btn.getAttribute("data-stage");
+          togglePlayUrl(url, stageKey + "_" + stimId);
+        });
+      });
+
+      document.querySelectorAll("input[data-slider-type]").forEach(slider => {
+        slider.addEventListener("input", e => {
+          const type = slider.getAttribute("data-slider-type");
+          const stimId = slider.getAttribute("data-stim");
+          const val = parseInt(e.target.value, 10);
+          if (type === "brightness") {
+            state.ratingsBrightness[stimId] = val;
+            document.getElementById(`val_b_${stimId}`).textContent = val;
+          } else {
+            state.ratingsRoughness[stimId] = val;
+            document.getElementById(`val_r_${stimId}`).textContent = val;
+          }
+        });
+      });
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN Y ENVÍO
+    // =========================================================================
+    function goToStep(stepNum) {
+      stopCurrentAudio();
+      state.currentStep = stepNum;
+
+      ["step1Section", "step2Section", "step3Section", "step4Section", "step5Section"].forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (idx + 1 === stepNum) {
+          el.classList.remove("hidden");
+        } else {
+          el.classList.add("hidden");
+        }
+      });
+
+      const counterEl = document.getElementById("stepHeaderCounter");
+      if (stepNum <= 4) {
+        counterEl.textContent = `Paso ${stepNum} de 4`;
+        document.getElementById("progressBar").style.width = `${stepNum * 25}%`;
+      } else {
+        counterEl.textContent = "Finalizado";
+        document.getElementById("progressBar").style.width = "100%";
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function finalizeAndSubmit() {
+      if (hasAlreadySubmitted()) {
+        goToStep(5);
+        return;
+      }
+
+      stopCurrentAudio();
+      const btnSubmit = document.getElementById("btnSubmitFinal");
+      const btnText = document.getElementById("btnSubmitFinalText");
+      btnSubmit.disabled = true;
+      btnText.textContent = "Enviando...";
+
+      const record = {
+        deviceId: state.deviceId,
+        alias: state.participant.alias || "Anónimo",
+        age: state.participant.age,
+        hearing: state.participant.hearing,
+        headphones: state.participant.headphones,
+        exposure: state.participant.exposure,
+        sensibility: state.participant.sensibility,
+        experience: state.participant.experience,
+        comments: document.getElementById("inputComments")?.value || "",
+        brightness: { ...state.ratingsBrightness },
+        roughness: { ...state.ratingsRoughness }
+      };
+
+      if (GOOGLE_SHEETS_WEBHOOK_URL && GOOGLE_SHEETS_WEBHOOK_URL.startsWith("http")) {
+        try {
+          await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(record)
+          });
+        } catch (err) {}
+      }
+
+      markAsSubmitted();
+      goToStep(5);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      if (hasAlreadySubmitted()) {
+        document.getElementById("submissionStatusText").textContent = "Ya registraste una respuesta desde este dispositivo. ¡Muchas gracias por participar!";
+        goToStep(5);
+        return;
+      }
+
+      state.orderStageA = shuffleArray(STIMULI_LIST);
+      state.orderStageB = shuffleArray(STIMULI_LIST);
+      renderStimuliGrids();
+
+      document.getElementById("btnStep1Next").addEventListener("click", () => {
+        const ageVal = document.getElementById("inputAge").value.trim();
+        const hpVal = document.getElementById("selectHeadphones").value;
+        const errBox = document.getElementById("step1Error");
+
+        if (!ageVal || !hpVal) {
+          errBox.classList.remove("hidden");
+          return;
+        }
+        errBox.classList.add("hidden");
+
+        state.participant.alias = document.getElementById("inputAlias").value.trim();
+        state.participant.age = ageVal;
+        state.participant.hearing = document.getElementById("selectHearing").value;
+        state.participant.headphones = hpVal;
+        state.participant.exposure = document.getElementById("selectExposure").value;
+        state.participant.sensibility = document.getElementById("selectSensibility").value;
+        state.participant.experience = document.getElementById("selectExperience").value;
+
+        goToStep(2);
+      });
+
+      document.getElementById("btnPlayCalibration").addEventListener("click", () => {
+        togglePlayUrl(CALIBRATION_AUDIO_URL, "CAL");
+      });
+
+      document.getElementById("btnStep2Back").addEventListener("click", () => goToStep(1));
+      document.getElementById("btnStep2Next").addEventListener("click", () => goToStep(3));
+
+      // document.getElementById("btnStopAllA").addEventListener("click", stopCurrentAudio);
+      document.getElementById("btnStep3Back").addEventListener("click", () => goToStep(2));
+      document.getElementById("btnStep3Next").addEventListener("click", () => goToStep(4));
+
+      // document.getElementById("btnStopAllB").addEventListener("click", stopCurrentAudio);
+      document.getElementById("btnStep4Back").addEventListener("click", () => goToStep(3));
+      document.getElementById("btnSubmitFinal").addEventListener("click", finalizeAndSubmit);
+    });
+  </script>
+</body>
+</html>
