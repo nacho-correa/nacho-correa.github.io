@@ -80,7 +80,7 @@
       <div class="space-y-2 border-b border-slate-300/80 pb-4">
         <h2 class="text-lg sm:text-xl font-bold text-slate-900">Cuestionario inicial</h2>
         <p class="text-sm text-slate-700 leading-relaxed">
-          Esta prueba evalúa la percepción de distintas características del sonido y tiene una duración de <strong>3 a 5 minutos</strong>. Es importante que la realices con <strong>auriculares</strong> y en un <strong>ambiente silencioso</strong>, libre de ruidos de fondo o interrupciones.
+          Esta prueba evalúa la percepción de distintas características del sonido y tiene una duración de <strong>aproximadamente 5 minutos</strong>. Es importante que la realices con <strong>auriculares</strong> y en un <strong>ambiente silencioso</strong>, libre de ruidos de fondo o interrupciones.
         </p>
       </div>
 
@@ -96,7 +96,7 @@
           <label for="inputAge" class="block text-xs font-semibold text-slate-700 mb-1">
             Edad <span class="text-rose-600">*</span>
           </label>
-          <input id="inputAge" type="number" min="15" max="60" placeholder="" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none" />
+          <input id="inputAge" type="number" min="15" max="99" placeholder="" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none" />
         </div>
 
         <div>
@@ -116,7 +116,7 @@
           <select id="selectHeadphones" class="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 card-surface focus:border-sky-600 outline-none">
             <option value="">Seleccioná una opción...</option>
             <option value="over-ear">De vincha (sobre la oreja)</option>
-            <option value="earbuds">Earbuds clásicos (sobre el oído)</option>
+            <option value="earbuds">Auriculares clásicos (sobre el oído)</option>
             <option value="in-ear">In-ear (dentro del oído)</option>
           </select>
         </div>        
@@ -234,8 +234,10 @@
         <div>
           <h2 class="text-lg sm:text-xl font-bold text-sky-800">Etapa 1: Evaluación de Brillo</h2>
           <p class="text-xs sm:text-sm text-slate-600">
-            Escuchá y compará los 6 sonidos. Calificá qué tan <strong>brillante o agudo</strong> suena cada uno del 0 al 100.
-            Se sugiere escuchar primero los 6 sonidos para identificar los extremos antes de fijar tus puntajes.
+            Brillo: Qué tan <strong>agudo, metálico o "chillón"</strong> suena el audio.
+          </p>  
+          <p class="text-xs sm:text-sm text-slate-600">
+            Calificá cada sonido del 0 al 100. Te sugerimos escuchar primero los 6 audios para identificar los extremos antes de fijar tus puntajes.
           </p>
         </div>        
       </div>
@@ -260,8 +262,10 @@
         <div>
           <h2 class="text-lg sm:text-xl font-bold text-amber-800">Etapa 2: Evaluación de Rugosidad</h2>
           <p class="text-xs sm:text-sm text-slate-600">
-            Escuchá y compará los 6 sonidos. Calificá qué tan <strong>áspero o rasposo</strong> se siente cada uno del 0 al 100.
-            Se sugiere escuchar primero los 6 sonidos para identificar los extremos antes de fijar tus puntajes.
+            Rugosidad: Qué tan <strong>áspero, rasposo o vibrante</strong> se siente el audio.
+          </p>
+          <p class="text-xs sm:text-sm text-slate-600">
+            Calificá cada sonido del 0 al 100. Te sugerimos escuchar primero los 6 audios para identificar los extremos antes de fijar tus puntajes.
           </p>
         </div>
       </div>
@@ -351,6 +355,14 @@
         localStorage.setItem("mushra_untref_completed", "true");
       } catch (e) {}
     }
+
+    const timestamps = {
+      start: [getDate()],
+      calibration: [],
+      stageA: [],
+      stageB: [],
+      end: null
+    };
 
     const state = {
       currentStep: 1,
@@ -539,9 +551,30 @@
     // =========================================================================
     // NAVEGACIÓN Y ENVÍO
     // =========================================================================
+
+    function getDate(){
+      const now = new Date();
+      return now.toString().substring(0, now.toString().indexOf("GMT") + 8);
+    }
+
     function goToStep(stepNum) {
       stopCurrentAudio();
       state.currentStep = stepNum;
+
+      switch (stepNum) {
+        case 1:
+          timestamps.start.push(getDate());
+          break;
+        case 2:
+          timestamps.calibration.push(getDate());
+          break;
+        case 3:
+          timestamps.stageA.push(getDate());
+          break;
+        case 4:
+          timestamps.stageB.push(getDate());
+          break;
+      }
 
       ["step1Section", "step2Section", "step3Section", "step4Section", "step5Section"].forEach((id, idx) => {
         const el = document.getElementById(id);
@@ -575,6 +608,8 @@
       btnSubmit.disabled = true;
       btnText.textContent = "Enviando...";
 
+      timestamps.end = getDate();
+
       const record = {
         deviceId: state.deviceId,
         alias: state.participant.alias || "Anónimo",
@@ -586,7 +621,8 @@
         experience: state.participant.experience,
         comments: document.getElementById("inputComments")?.value || "",
         brightness: { ...state.ratingsBrightness },
-        roughness: { ...state.ratingsRoughness }
+        roughness: { ...state.ratingsRoughness },
+        timestamps: timestamps
       };
 
       if (GOOGLE_SHEETS_WEBHOOK_URL && GOOGLE_SHEETS_WEBHOOK_URL.startsWith("http")) {

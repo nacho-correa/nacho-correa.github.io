@@ -1,1 +1,1 @@
-# nacho-correa.github.io
+Repositorio para formulario de test subjetivo Evaluación de Brillo y Rugosidad.
